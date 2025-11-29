@@ -1,0 +1,13 @@
+flowchart LR
+  A[User Browser] -->|upload resumes / paste JD| B[Streamlit UI (app.py)]
+  B --> C[Text Extraction]
+  C --> D[Embeddings Service]
+  D --> E{Vector DB}
+  E -->|Pinecone (prod)| F[Pinecone Index]
+  E -->|Local fallback| G[In-memory index]
+  D --> H[Scoring Pipeline]
+  H --> I[Ranking & Bias Detection]
+  I --> J[LLM Explanations (OpenAI)]
+  J --> B
+  B --> K[CSV Export]
+  B --> L[Optional: Supabase Storage]
