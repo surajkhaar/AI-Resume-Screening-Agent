@@ -19,54 +19,201 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for better UI
+# Enhanced Custom CSS with modern styling
 st.markdown("""
     <style>
-    .main {
-        padding: 2rem;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * {
+        font-family: 'Inter', sans-serif;
     }
+    
+    .main {
+        padding: 1rem 2rem;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    .hero-header {
+        text-align: center;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        color: white;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    .hero-header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .hero-header p {
+        font-size: 1.2rem;
+        font-weight: 300;
+        opacity: 0.95;
+        margin-top: 0.5rem;
+    }
+    
+    .card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+    
+    .candidate-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        border-left: 5px solid #667eea;
+    }
+    
+    .score-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 1rem;
+        margin: 0.5rem 0;
+    }
+    
+    .score-high {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+    }
+    
+    .score-med {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+    }
+    
+    .score-low {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+    }
+    
+    .gradient-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 10px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        transition: all 0.3s;
+    }
+    
+    .gradient-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+    
     .stTextArea textarea {
         font-size: 14px;
-    }
-    .upload-section {
-        padding: 1rem;
         border-radius: 10px;
-        background-color: #f0f2f6;
+    }
+    
+    .upload-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         margin-bottom: 1rem;
     }
+    
     .score-bar {
-        background-color: #e0e0e0;
+        background-color: #e5e7eb;
         border-radius: 10px;
         height: 25px;
         margin: 10px 0;
         overflow: hidden;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
     }
+    
     .score-fill {
         height: 100%;
         text-align: center;
         line-height: 25px;
         color: white;
-        font-weight: bold;
+        font-weight: 600;
         font-size: 14px;
+        transition: width 0.5s ease;
     }
+    
     .score-excellent {
         background: linear-gradient(90deg, #10b981, #059669);
     }
+    
     .score-good {
         background: linear-gradient(90deg, #3b82f6, #2563eb);
     }
+    
     .score-moderate {
         background: linear-gradient(90deg, #f59e0b, #d97706);
     }
+    
     .score-weak {
         background: linear-gradient(90deg, #ef4444, #dc2626);
     }
+    
     .explanation-box {
-        background-color: #f8f9fa;
-        border-left: 4px solid #3b82f6;
-        padding: 15px;
-        border-radius: 5px;
-        margin: 10px 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-left: 4px solid #667eea;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin: 1rem 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    .reason-item {
+        padding: 0.75rem;
+        margin: 0.5rem 0;
+        background: white;
+        border-radius: 8px;
+        border-left: 3px solid #667eea;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        border-top: 4px solid #667eea;
+    }
+    
+    .stat-card h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+        margin: 0.5rem 0;
+    }
+    
+    .stat-card p {
+        color: #6b7280;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    
+    h1, h2, h3 {
+        font-weight: 600;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -92,6 +239,69 @@ def extract_text_from_docx(file):
     except Exception as e:
         st.error(f"Error reading DOCX: {str(e)}")
     return text
+
+def render_candidate_card(rank, name, score, breakdown, top_reasons, recommendation=""):
+    """Render a modern candidate card with score badge and reasons"""
+    
+    # Determine score class and emoji
+    if score >= 0.8:
+        score_class = "score-high"
+        emoji = "🌟"
+        match_text = "EXCELLENT MATCH"
+    elif score >= 0.6:
+        score_class = "score-med"
+        emoji = "👍"
+        match_text = "GOOD MATCH"
+    elif score >= 0.4:
+        score_class = "score-med"
+        emoji = "🤔"
+        match_text = "MODERATE MATCH"
+    else:
+        score_class = "score-low"
+        emoji = "❌"
+        match_text = "WEAK MATCH"
+    
+    # Build reasons HTML
+    reasons_html = ""
+    for i, reason in enumerate(top_reasons[:5], 1):
+        reasons_html += f"""
+        <div class="reason-item">
+            <strong>{i}.</strong> {reason}
+        </div>
+        """
+    
+    card_html = f"""
+    <div class="candidate-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+                <h3 style="margin: 0; color: #1f2937;">#{rank} {emoji} {name}</h3>
+                <p style="margin: 0.25rem 0; color: #6b7280; font-size: 0.9rem;">{match_text}</p>
+            </div>
+            <div class="score-badge {score_class}">
+                {score:.1%}
+            </div>
+        </div>
+        
+        <div style="margin: 1rem 0;">
+            <p style="font-weight: 600; color: #4b5563; margin-bottom: 0.5rem;">📊 Score Breakdown</p>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; font-size: 0.85rem;">
+                <div>💡 Skills: <strong>{breakdown.skill_match_score:.0%}</strong></div>
+                <div>💼 Experience: <strong>{breakdown.experience_score:.0%}</strong></div>
+                <div>🎓 Education: <strong>{breakdown.education_score:.0%}</strong></div>
+                <div>🔍 Semantic: <strong>{breakdown.semantic_similarity_score:.0%}</strong></div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 1rem;">
+            <p style="font-weight: 600; color: #4b5563; margin-bottom: 0.5rem;">✨ Top Reasons</p>
+            {reasons_html}
+        </div>
+        
+        {f'<div style="margin-top: 1rem; padding: 1rem; background: #f3f4f6; border-radius: 8px;"><strong>💡 Recommendation:</strong> {recommendation}</div>' if recommendation else ''}
+    </div>
+    """
+    
+    st.markdown(card_html, unsafe_allow_html=True)
 
 def main():
     # Initialize session state
@@ -125,16 +335,21 @@ def main():
     if 'analysis_results' not in st.session_state:
         st.session_state.analysis_results = None
     
-    # Header
-    st.title("📄 Resume Analyzer")
-    st.markdown("### Upload resumes and compare them with job descriptions")
+    # Hero Header
+    st.markdown("""
+        <div class="hero-header">
+            <div style="font-size: 3rem;">📄</div>
+            <h1>Resume Analyzer</h1>
+            <p>AI-powered resume matching, scoring & bias detection</p>
+        </div>
+    """, unsafe_allow_html=True)
     
     # Create two columns for layout
-    col1, col2 = st.columns([1, 1])
+    col_left, col_right = st.columns([1, 1])
     
-    with col1:
-        st.markdown("#### 📂 Upload Resumes")
-        st.markdown('<div class="upload-section">', unsafe_allow_html=True)
+    with col_left:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown("### 📂 Upload Resumes")
         
         # File uploader for resumes (supports multiple files)
         uploaded_files = st.file_uploader(
@@ -204,10 +419,12 @@ def main():
                         
                         # Reset file pointer for potential reprocessing
                         file.seek(0)
+        
+        st.markdown('</div>', unsafe_allow_html=True)
     
-    with col2:
-        st.markdown("#### 📝 Job Description")
-        st.markdown('<div class="upload-section">', unsafe_allow_html=True)
+    with col_right:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown("### 📝 Job Description")
         
         # Text area for job description
         job_description = st.text_area(
@@ -370,14 +587,16 @@ def main():
                                 st.markdown(f"**Recommendation:** {flag.recommendation}")
                                 
                                 if flag.affected_candidates:
-                                    with st.expander(f"Affected candidates ({len(flag.affected_candidates)})"):
+                                    with st.container():
+                                        st.markdown(f"**Affected candidates ({len(flag.affected_candidates)}):**")
                                         for candidate in flag.affected_candidates[:10]:
                                             st.write(f"• {candidate}")
                                         if len(flag.affected_candidates) > 10:
                                             st.caption(f"... and {len(flag.affected_candidates) - 10} more")
                                 
                                 if flag.details:
-                                    with st.expander("Technical details"):
+                                    with st.container():
+                                        st.markdown("**Technical details:**")
                                         st.json(flag.details)
                                 
                                 st.markdown("---")
@@ -392,14 +611,16 @@ def main():
                                 st.markdown(f"**Recommendation:** {flag.recommendation}")
                                 
                                 if flag.affected_candidates:
-                                    with st.expander(f"Affected candidates ({len(flag.affected_candidates)})"):
+                                    with st.container():
+                                        st.markdown(f"**Affected candidates ({len(flag.affected_candidates)}):**")
                                         for candidate in flag.affected_candidates[:10]:
                                             st.write(f"• {candidate}")
                                         if len(flag.affected_candidates) > 10:
                                             st.caption(f"... and {len(flag.affected_candidates) - 10} more")
                                 
                                 if flag.details:
-                                    with st.expander("Technical details"):
+                                    with st.container():
+                                        st.markdown("**Technical details:**")
                                         st.json(flag.details)
                                 
                                 st.markdown("---")
@@ -414,14 +635,16 @@ def main():
                                 st.markdown(f"**Recommendation:** {flag.recommendation}")
                                 
                                 if flag.affected_candidates:
-                                    with st.expander(f"Affected candidates ({len(flag.affected_candidates)})"):
+                                    with st.container():
+                                        st.markdown(f"**Affected candidates ({len(flag.affected_candidates)}):**")
                                         for candidate in flag.affected_candidates[:10]:
                                             st.write(f"• {candidate}")
                                         if len(flag.affected_candidates) > 10:
                                             st.caption(f"... and {len(flag.affected_candidates) - 10} more")
                                 
                                 if flag.details:
-                                    with st.expander("Technical details"):
+                                    with st.container():
+                                        st.markdown("**Technical details:**")
                                         st.json(flag.details)
                                 
                                 st.markdown("---")
@@ -436,25 +659,48 @@ def main():
         st.markdown("### 🏆 Ranked Candidates")
         
         for rank, (resume_data, breakdown, explanation) in enumerate(results_with_explanations, 1):
-            # Determine emoji and color based on score
-            if breakdown.final_score >= 0.8:
-                emoji = "🌟"
-                score_class = "score-excellent"
-            elif breakdown.final_score >= 0.6:
-                emoji = "👍"
-                score_class = "score-good"
-            elif breakdown.final_score >= 0.4:
-                emoji = "🤔"
-                score_class = "score-moderate"
+            # Prepare top reasons
+            top_reasons = []
+            if explanation and hasattr(explanation, 'top_reasons'):
+                top_reasons = explanation.top_reasons
             else:
-                emoji = "❌"
-                score_class = "score-weak"
+                # Generate basic reasons from breakdown
+                if breakdown.matched_skills:
+                    top_reasons.append(f"Matches {len(breakdown.matched_skills)} required skills: {', '.join(breakdown.matched_skills[:3])}")
+                if breakdown.experience_years:
+                    top_reasons.append(f"Has {breakdown.experience_years} years of experience")
+                if breakdown.has_required_degree:
+                    top_reasons.append("Possesses required educational qualifications")
+                if breakdown.semantic_similarity_score >= 0.7:
+                    top_reasons.append(f"Strong semantic alignment ({breakdown.semantic_similarity_score:.0%}) with job description")
+                if breakdown.missing_skills:
+                    top_reasons.append(f"Missing {len(breakdown.missing_skills)} skills: {', '.join(breakdown.missing_skills[:2])}")
             
-            with st.expander(
-                f"#{rank} {emoji} {resume_data.get('name', 'Unknown')} - "
-                f"**{breakdown.final_score:.1%}** Match",
-                expanded=(rank <= 3)
-            ):
+            # Get recommendation
+            recommendation = explanation.recommendation if explanation and hasattr(explanation, 'recommendation') else ""
+            
+            # Render the candidate card
+            render_candidate_card(
+                rank=rank,
+                name=resume_data.get('name', 'Unknown'),
+                score=breakdown.final_score,
+                breakdown=breakdown,
+                top_reasons=top_reasons,
+                recommendation=recommendation
+            )
+            
+            # Add detailed view in an expander
+            with st.expander(f"📄 View Full Details for {resume_data.get('name', 'Unknown')}"):
+                # Determine score class for detailed view
+                if breakdown.final_score >= 0.8:
+                    score_class = "score-excellent"
+                elif breakdown.final_score >= 0.6:
+                    score_class = "score-good"
+                elif breakdown.final_score >= 0.4:
+                    score_class = "score-moderate"
+                else:
+                    score_class = "score-weak"
+                
                 # Overall score bar
                 st.markdown("**🎯 Overall Match Score**")
                 score_percentage = breakdown.final_score * 100
@@ -587,7 +833,8 @@ def main():
                     st.write(resume_data['summary'])
                 
                 # Full JSON data
-                with st.expander("📄 View Full Data"):
+                with st.container():
+                    st.markdown("**📄 Full Data**")
                     col_json1, col_json2 = st.columns(2)
                     with col_json1:
                         st.markdown("**Resume Data:**")
@@ -603,19 +850,39 @@ def main():
         col_stat1, col_stat2, col_stat3, col_stat4 = st.columns(4)
         
         with col_stat1:
-            st.metric("Total Candidates", len(results_with_explanations))
+            st.markdown(f"""
+                <div class="stat-card">
+                    <p>Total Candidates</p>
+                    <h3>{len(results_with_explanations)}</h3>
+                </div>
+            """, unsafe_allow_html=True)
         
         with col_stat2:
             avg_score = sum([b.final_score for _, b, _ in results_with_explanations]) / len(results_with_explanations)
-            st.metric("Average Score", f"{avg_score:.1%}")
+            st.markdown(f"""
+                <div class="stat-card">
+                    <p>Average Score</p>
+                    <h3>{avg_score:.1%}</h3>
+                </div>
+            """, unsafe_allow_html=True)
         
         with col_stat3:
             strong_matches = sum(1 for _, b, _ in results_with_explanations if b.final_score >= 0.8)
-            st.metric("Strong Matches", strong_matches)
+            st.markdown(f"""
+                <div class="stat-card">
+                    <p>Strong Matches</p>
+                    <h3>{strong_matches}</h3>
+                </div>
+            """, unsafe_allow_html=True)
         
         with col_stat4:
             avg_exp = sum([r.get('experience_years', 0) or 0 for r, _, _ in results_with_explanations]) / len(results_with_explanations)
-            st.metric("Avg Experience", f"{avg_exp:.1f} yrs")
+            st.markdown(f"""
+                <div class="stat-card">
+                    <p>Avg Experience</p>
+                    <h3>{avg_exp:.1f} yrs</h3>
+                </div>
+            """, unsafe_allow_html=True)
         
         # Skills overview
         st.markdown("### 💡 Skills Overview")
