@@ -50,24 +50,28 @@ class EmbeddingsManager:
         self.pinecone_index_name = pinecone_index_name
         self.use_faiss_fallback = use_faiss_fallback
         
-        # Try to initialize Pinecone, fallback to FAISS if needed
+        # Try to initialize Pinecone, fallback to FAISS, then to in-memory if needed
         self.vector_db_type = None
         self.index = None
         self.faiss_metadata = {}  # Store metadata for FAISS vectors
+        self.memory_vectors = {}  # In-memory vector storage as final fallback
         
         self._initialize_vector_db()
     
     def _initialize_vector_db(self):
-        """Initialize vector database (Pinecone or FAISS)."""
+        """Initialize vector database (Pinecone, FAISS, or in-memory fallback)."""
         # Try Pinecone first
+        pinecone_index = os.getenv("PINECONE_INDEX")
         if self.pinecone_api_key and self.pinecone_environment:
             try:
+                if pinecone_index:
+                    self.pinecone_index_name = pinecone_index
                 self._initialize_pinecone()
                 self.vector_db_type = "pinecone"
                 logger.info("Using Pinecone for vector storage")
                 return
             except Exception as e:
-                logger.warning(f"Failed to initialize Pinecone: {e}")
+                logger.warning(f"Pinecone initialization failed, falling back to local index. Error: {e}")
         
         # Fallback to FAISS
         if self.use_faiss_fallback:
@@ -77,10 +81,13 @@ class EmbeddingsManager:
                 logger.info("Using FAISS for vector storage (local)")
                 return
             except Exception as e:
-                logger.error(f"Failed to initialize FAISS: {e}")
-                raise RuntimeError("Could not initialize any vector database")
+                logger.warning(f"FAISS initialization failed, using in-memory storage. Error: {e}")
         
-        raise RuntimeError("No vector database available. Provide Pinecone credentials or enable FAISS fallback.")
+        # Final fallback: in-memory numpy-based storage
+        logger.info("Pinecone initialization failed, falling back to local index.")
+        self.vector_db_type = "memory"
+        self.memory_vectors = {}
+        logger.info("Using in-memory vector storage (numpy-based)")
     
     def _initialize_pinecone(self):
         """Initialize Pinecone index."""
@@ -238,6 +245,8 @@ class EmbeddingsManager:
                 self._upsert_pinecone(resume_id, embedding, metadata)
             elif self.vector_db_type == "faiss":
                 self._upsert_faiss(resume_id, embedding, metadata)
+            elif self.vector_db_type == "memory":
+                self._upsert_memory(resume_id, embedding, metadata)
             else:
                 raise RuntimeError("No vector database initialized")
             
@@ -273,6 +282,13 @@ class EmbeddingsManager:
         
         # Store metadata separately
         self.faiss_metadata[numeric_id] = metadata
+    
+    def _upsert_memory(self, resume_id: str, embedding: np.ndarray, metadata: Dict):
+        """Upsert vector to in-memory storage."""
+        self.memory_vectors[resume_id] = {
+            'embedding': embedding,
+            'metadata': metadata
+        }
     
     def upsert_resumes_batch(
         self,
@@ -321,6 +337,8 @@ class EmbeddingsManager:
                 return self._search_pinecone(query_embedding, top_k, filter_dict)
             elif self.vector_db_type == "faiss":
                 return self._search_faiss(query_embedding, top_k)
+            elif self.vector_db_type == "memory":
+                return self._search_memory(query_embedding, top_k)
             else:
                 raise RuntimeError("No vector database initialized")
                 
@@ -381,6 +399,29 @@ class EmbeddingsManager:
             search_results.append(result)
         
         return search_results
+    
+    def _search_memory(
+        self,
+        query_embedding: np.ndarray,
+        top_k: int
+    ) -> List[Dict]:
+        """Search in in-memory storage using cosine similarity."""
+        if not self.memory_vectors:
+            return []
+        
+        # Calculate cosine similarity for all vectors
+        similarities = []
+        for resume_id, data in self.memory_vectors.items():
+            similarity = self._cosine_similarity(query_embedding, data['embedding'])
+            similarities.append({
+                'id': resume_id,
+                'score': float(similarity),
+                'metadata': data['metadata']
+            })
+        
+        # Sort by score descending and return top_k
+        similarities.sort(key=lambda x: x['score'], reverse=True)
+        return similarities[:top_k]
     
     def compare_resume_to_job(
         self,
@@ -454,6 +495,8 @@ class EmbeddingsManager:
             stats["total_vectors"] = index_stats.get('total_vector_count', 0)
         elif self.vector_db_type == "faiss":
             stats["total_vectors"] = self.index.ntotal
+        elif self.vector_db_type == "memory":
+            stats["total_vectors"] = len(self.memory_vectors)
         
         return stats
     
@@ -530,6 +573,73 @@ class EmbeddingsManager:
             
         except Exception as e:
             logger.error(f"Error loading FAISS index: {e}")
+    
+    # Public method aliases for consistent API
+    def embed_text(self, text: str) -> np.ndarray:
+        """
+        Generate embedding for text (alias for generate_embedding).
+        
+        Args:
+            text: Input text
+            
+        Returns:
+            Embedding vector as numpy array
+        """
+        return self.generate_embedding(text)
+    
+    def upsert(self, resume_id: str, resume_data: Dict, custom_text: Optional[str] = None) -> bool:
+        """
+        Add or update resume (alias for upsert_resume).
+        
+        Args:
+            resume_id: Unique identifier for the resume
+            resume_data: Parsed resume dictionary
+            custom_text: Optional custom text
+            
+        Returns:
+            True if successful
+        """
+        return self.upsert_resume(resume_id, resume_data, custom_text)
+    
+    def query(self, query_text: str, top_k: int = 10, filter_dict: Optional[Dict] = None) -> List[Dict]:
+        """
+        Search for similar resumes (alias for search).
+        
+        Args:
+            query_text: Search query text
+            top_k: Number of results to return
+            filter_dict: Optional metadata filters
+            
+        Returns:
+            List of search results with scores and metadata
+        """
+        return self.search(query_text, top_k, filter_dict)
+    
+    def clear(self) -> bool:
+        """
+        Clear all vectors from the database.
+        
+        Returns:
+            True if successful
+        """
+        try:
+            if self.vector_db_type == "pinecone":
+                # Delete all vectors in Pinecone
+                self.index.delete(delete_all=True)
+                logger.info("Cleared all vectors from Pinecone")
+            elif self.vector_db_type == "faiss":
+                # Recreate FAISS index
+                self._initialize_faiss()
+                self.faiss_metadata = {}
+                logger.info("Cleared all vectors from FAISS")
+            elif self.vector_db_type == "memory":
+                # Clear in-memory storage
+                self.memory_vectors = {}
+                logger.info("Cleared all vectors from memory")
+            return True
+        except Exception as e:
+            logger.error(f"Error clearing vectors: {e}")
+            return False
 
 
 # Convenience functions
