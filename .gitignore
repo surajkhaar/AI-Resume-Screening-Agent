@@ -115,3 +115,5 @@ test_resumes/
 *_key.txt
 *_secret.txt
 credentials.json
+.venv/
+.python-version
